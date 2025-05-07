@@ -1,0 +1,14 @@
+:root {
+  --big-text-font-family: "Open Sans", Helvetica;
+  --big-text-font-size: 14px;
+  --big-text-font-style: normal;
+  --big-text-font-weight: 700;
+  --big-text-letter-spacing: 0.10000000149011612px;
+  --big-text-line-height: normal;
+  --small-text-font-family: "Open Sans", Helvetica;
+  --small-text-font-size: 10px;
+  --small-text-font-style: normal;
+  --small-text-font-weight: 400;
+  --small-text-letter-spacing: 0.10000000149011612px;
+  --small-text-line-height: normal;
+}
