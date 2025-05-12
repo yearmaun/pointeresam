@@ -28,9 +28,9 @@
     .field span {
       font-weight: bold;
     }
-    img {
-      border-radius: 8px;
-      max-width: 150px;
+    .photo-url {
+      word-wrap: break-word;
+      white-space: pre-wrap;
     }
   </style>
 </head>
@@ -69,7 +69,7 @@
         <div class="field"><span>Username:</span> ${data.username}</div>
         <div class="field"><span>Auth Date:</span> ${data.auth_date}</div>
         <div class="field"><span>Hash:</span> ${data.hash}</div>
-        ${data.photo_url ? `<div class="field"><img src="${data.photo_url}" alt="Photo"></div>` : ''}
+        ${data.photo_url ? `<div class="field"><span>Photo URL:</span><div class="photo-url">${data.photo_url}</div></div>` : ''}
       `;
     });
   </script>
