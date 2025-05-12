@@ -46,6 +46,13 @@
       background: #f8d7da;
       color: #721c24;
     }
+    #debug-info {
+      margin-top: 20px;
+      background-color: #f1f1f1;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -53,6 +60,12 @@
     <h2>User Credentials</h2>
     <div id="fields">Loading...</div>
     <div id="verification" class="verified"></div>
+  </div>
+
+  <div id="debug-info">
+    <h3>Debug Information</h3>
+    <pre id="checkString">Check String: Loading...</pre>
+    <pre id="generatedHash">Generated Hash: Loading...</pre>
   </div>
 
   <script>
@@ -94,10 +107,19 @@
 
     async function verifyTelegramData(initData, receivedHash, botToken) {
       const encoder = new TextEncoder();
+      const checkString = initData.split('&').filter(p => !p.startsWith('hash=')).sort().join('\n');
+
+      // Выводим строку и сгенерированный хеш на страницу
+      document.getElementById('checkString').textContent = 'Check String: ' + checkString;
+
       const key = await window.crypto.subtle.digest("SHA-256", encoder.encode(botToken));
       const secretKey = await window.crypto.subtle.importKey("raw", key, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
-      const signature = await window.crypto.subtle.sign("HMAC", secretKey, encoder.encode(initData.split('&').filter(p => !p.startsWith('hash=')).sort().join('\n')));
+      const signature = await window.crypto.subtle.sign("HMAC", secretKey, encoder.encode(checkString));
       const hex = Array.from(new Uint8Array(signature)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+      // Выводим сгенерированный хеш на страницу
+      document.getElementById('generatedHash').textContent = 'Generated Hash: ' + hex;
+
       return hex === receivedHash;
     }
   </script>
