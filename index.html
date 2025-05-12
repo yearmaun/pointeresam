@@ -32,34 +32,48 @@
       word-wrap: break-word;
       white-space: pre-wrap;
     }
+    .verified {
+      margin-top: 20px;
+      padding: 10px;
+      font-weight: bold;
+      border-radius: 6px;
+    }
+    .verified.ok {
+      background: #d4edda;
+      color: #155724;
+    }
+    .verified.fail {
+      background: #f8d7da;
+      color: #721c24;
+    }
   </style>
 </head>
 <body>
   <div class="container" id="user-container">
     <h2>User Credentials</h2>
     <div id="fields">Loading...</div>
+    <div id="verification" class="verified"></div>
   </div>
 
   <script>
-    window.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("DOMContentLoaded", async () => {
       const tg = window.Telegram.WebApp;
       const user = tg.initDataUnsafe.user;
+      const initData = tg.initData || '';
+      const hashFromInitData = tg.initDataUnsafe.hash;
 
-      if (!user) {
-        document.getElementById('fields').innerHTML = 'No user data available.';
-        return;
-      }
+      const botToken = '8163248824:AAHcAR8vllK0hgGoXNvIVfDQbeBV0m3eOx8'; // ⚠️ Никогда не делай так в проде
 
-      const authDate = Math.floor(Date.now() / 1000); // use current timestamp as fallback
+      const authDate = Math.floor(Date.now() / 1000);
 
       const data = {
-        id: user.id,
-        first_name: user.first_name || '',
-        last_name: user.last_name || '',
-        username: user.username || '',
-        photo_url: user.photo_url || '',
-        auth_date: user.auth_date || authDate,
-        hash: tg.initDataUnsafe.hash || '(hash missing)'
+        id: user?.id,
+        first_name: user?.first_name || '',
+        last_name: user?.last_name || '',
+        username: user?.username || '',
+        photo_url: user?.photo_url || '',
+        auth_date: user?.auth_date || authDate,
+        hash: hashFromInitData || '(hash missing)'
       };
 
       document.getElementById('fields').innerHTML = `
@@ -71,7 +85,21 @@
         <div class="field"><span>Hash:</span> ${data.hash}</div>
         ${data.photo_url ? `<div class="field"><span>Photo URL:</span><div class="photo-url">${data.photo_url}</div></div>` : ''}
       `;
+
+      const isValid = await verifyTelegramData(initData, hashFromInitData, botToken);
+      const verificationEl = document.getElementById('verification');
+      verificationEl.textContent = isValid ? '✅ Пользователь верифицирован' : '❌ Верификация не пройдена';
+      verificationEl.className = 'verified ' + (isValid ? 'ok' : 'fail');
     });
+
+    async function verifyTelegramData(initData, receivedHash, botToken) {
+      const encoder = new TextEncoder();
+      const key = await window.crypto.subtle.digest("SHA-256", encoder.encode(botToken));
+      const secretKey = await window.crypto.subtle.importKey("raw", key, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+      const signature = await window.crypto.subtle.sign("HMAC", secretKey, encoder.encode(initData.split('&').filter(p => !p.startsWith('hash=')).sort().join('\n')));
+      const hex = Array.from(new Uint8Array(signature)).map(b => b.toString(16).padStart(2, '0')).join('');
+      return hex === receivedHash;
+    }
   </script>
 </body>
 </html>
