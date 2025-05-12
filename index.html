@@ -3,35 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Telegram User Info</title>
+  <title>Telegram User Credentials</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      background: #f7f7f7;
+      background: #f2f2f2;
     }
-    .user-info {
-      background: white;
-      border-radius: 8px;
-      padding: 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      max-width: 400px;
+    .container {
+      max-width: 600px;
       margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    .user-info img {
-      border-radius: 50%;
-      width: 80px;
-      height: 80px;
+    .container h2 {
+      margin-bottom: 16px;
     }
-    .user-info div {
-      margin-top: 10px;
+    .field {
+      margin-bottom: 12px;
+    }
+    .field span {
+      font-weight: bold;
+    }
+    img {
+      border-radius: 8px;
+      max-width: 150px;
     }
   </style>
 </head>
 <body>
-  <div class="user-info" id="user-info">
-    <h2>Loading user info...</h2>
+  <div class="container" id="user-container">
+    <h2>User Credentials</h2>
+    <div id="fields">Loading...</div>
   </div>
 
   <script>
@@ -40,18 +46,30 @@
       const user = tg.initDataUnsafe.user;
 
       if (!user) {
-        document.getElementById('user-info').innerHTML = '<h2>User data not available</h2>';
+        document.getElementById('fields').innerHTML = 'No user data available.';
         return;
       }
 
-      document.getElementById('user-info').innerHTML = `
-        <img src="${user.photo_url}" alt="User Photo" />
-        <div><strong>ID:</strong> ${user.id}</div>
-        <div><strong>First Name:</strong> ${user.first_name}</div>
-        <div><strong>Last Name:</strong> ${user.last_name || '—'}</div>
-        <div><strong>Username:</strong> @${user.username || '—'}</div>
-        <div><strong>Language:</strong> ${tg.initDataUnsafe.user?.language_code || '—'}</div>
-        <div><strong>Is Premium:</strong> ${user.is_premium ? 'Yes' : 'No'}</div>
+      const authDate = Math.floor(Date.now() / 1000); // use current timestamp as fallback
+
+      const data = {
+        id: user.id,
+        first_name: user.first_name || '',
+        last_name: user.last_name || '',
+        username: user.username || '',
+        photo_url: user.photo_url || '',
+        auth_date: user.auth_date || authDate,
+        hash: tg.initDataUnsafe.hash || '(hash missing)'
+      };
+
+      document.getElementById('fields').innerHTML = `
+        <div class="field"><span>ID:</span> ${data.id}</div>
+        <div class="field"><span>First Name:</span> ${data.first_name}</div>
+        <div class="field"><span>Last Name:</span> ${data.last_name}</div>
+        <div class="field"><span>Username:</span> ${data.username}</div>
+        <div class="field"><span>Auth Date:</span> ${data.auth_date}</div>
+        <div class="field"><span>Hash:</span> ${data.hash}</div>
+        ${data.photo_url ? `<div class="field"><img src="${data.photo_url}" alt="Photo"></div>` : ''}
       `;
     });
   </script>
