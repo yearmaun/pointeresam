@@ -2,56 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Telegram WebApp Data</title>
+  <title>Telegram initData Viewer</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: monospace;
       padding: 20px;
-      background: #f2f2f2;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .container h2 {
-      margin-bottom: 16px;
+      background-color: #f0f0f0;
     }
     pre {
-      background: #f8f8f8;
+      background: #fff;
       padding: 16px;
       border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       white-space: pre-wrap;
-      word-wrap: break-word;
+      word-break: break-word;
     }
   </style>
 </head>
 <body>
-  <div class="container" id="user-container">
-    <h2>Telegram WebApp Data</h2>
-    <pre id="json-output">Loading...</pre>
-  </div>
+  <h2>Telegram WebApp initData</h2>
+  <pre id="output">Loading...</pre>
 
   <script>
     window.addEventListener("DOMContentLoaded", () => {
-      const tg = window.Telegram.WebApp;
-
-      // Делаем проверку, что Telegram данные доступны
-      if (!tg || !tg.initDataUnsafe) {
-        document.getElementById('json-output').textContent = 'No Telegram data available.';
-        return;
-      }
-
-      // Преобразуем initDataUnsafe в JSON строку и выводим
-      const data = tg.initDataUnsafe;
-
-      // Выводим данные в виде JSON
-      document.getElementById('json-output').textContent = JSON.stringify(data, null, 2);
+      const initData = Telegram.WebApp.initData;
+      document.getElementById("output").textContent = initData || "initData is empty";
     });
   </script>
 </body>
