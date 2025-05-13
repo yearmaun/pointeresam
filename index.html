@@ -21,13 +21,24 @@
   </style>
 </head>
 <body>
-  <h2>Telegram WebApp initData</h2>
+  <h2>Parsed Telegram initData (JSON)</h2>
   <pre id="output">Loading...</pre>
 
   <script>
     window.addEventListener("DOMContentLoaded", () => {
-      const initData = Telegram.WebApp.initData;
-      document.getElementById("output").textContent = initData || "initData is empty";
+      const rawInitData = Telegram.WebApp.initData;
+      const params = new URLSearchParams(rawInitData);
+      const parsed = {};
+
+      for (const [key, value] of params.entries()) {
+        try {
+          parsed[key] = JSON.parse(decodeURIComponent(value));
+        } catch {
+          parsed[key] = decodeURIComponent(value);
+        }
+      }
+
+      document.getElementById("output").textContent = JSON.stringify(parsed, null, 2);
     });
   </script>
 </body>
